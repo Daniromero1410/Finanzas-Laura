@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gastos Laurita Pocoyo</title>
+    
+    <!-- Tailwind CSS y DaisyUI para componentes modernos -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@2.6.0/dist/full.css" rel="stylesheet">
+    
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        /* Estilos para la animación del mensaje y la imagen */
+        .success-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            animation: fadeInOut 3s ease-in-out;
+        }
+
+        .success-image {
+            width: 200px;
+            height: auto;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(-50%, -40%); }
+            15% { opacity: 1; transform: translate(-50%, -50%); }
+            85% { opacity: 1; transform: translate(-50%, -50%); }
+            100% { opacity: 0; transform: translate(-50%, -60%); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Contenedor para el mensaje de éxito y la imagen -->
+    <div id="successContainer" class="success-container">
+        <img src="static\img\Vintage Art Deco Logo (1).png" alt="Success Cat" class="success-image">
+        <div id="mensaje" class="alert"></div>
+    </div>
+
+    <!-- Navbar superior -->
+    <nav class="bg-primary text-primary-content shadow-lg">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-wallet text-2xl mr-2"></i>
+                    <span class="text-lg font-bold">Control de Gastos Laurita Pocoyo</span>
+                </div>
+                <div id="currentDate" class="text-sm"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenedor principal -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Tarjeta del formulario -->
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-6">
+                    <i class="fas fa-plus-circle mr-2"></i>Nuevo Registro
+                </h2>
+                
+                <form id="gastos-form" class="space-y-6">
+                    <!-- Grid para los campos del formulario -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- [Resto de los campos del formulario igual que antes...] -->
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text flex items-center">
+                                    <i class="fas fa-calendar-alt mr-2"></i>Mes
+                                </span>
+                            </label>
+                            <select id="mes" class="select select-bordered w-full" required>
+                                <option value="ENERO">ENERO</option>
+                                <option value="FEBRERO">FEBRERO</option>
+                                <option value="MARZO">MARZO</option>
+                                <option value="ABRIL">ABRIL</option>
+                                <option value="MAYO">MAYO</option>
+                                <option value="JUNIO">JUNIO</option>
+                                <option value="JULIO">JULIO</option>
+                                <option value="AGOSTO">AGOSTO</option>
+                                <option value="SEPTIEMBRE">SEPTIEMBRE</option>
+                                <option value="OCTUBRE">OCTUBRE</option>
+                                <option value="NOVIEMBRE">NOVIEMBRE</option>
+                                <option value="DICIEMBRE">DICIEMBRE</option>
+                            </select>
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text flex items-center">
+                                    <i class="fas fa-tags mr-2"></i>Categoría
+                                </span>
+                            </label>
+                            <select id="categoria" class="select select-bordered w-full" required>
+                                <option value="comida">🍽️ Comida</option>
+                                <option value="transporte">🚗 Transporte</option>
+                                <option value="otros">📦 Otros</option>
+                            </select>
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text flex items-center">
+                                    <i class="fas fa-align-left mr-2"></i>Descripción
+                                </span>
+                            </label>
+                            <input type="text" id="descripcion" class="input input-bordered" required>
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text flex items-center">
+                                    <i class="fas fa-dollar-sign mr-2"></i>Valor (miles de pesos)
+                                </span>
+                            </label>
+                            <input type="number" id="precio" class="input input-bordered" min="0" step="1" required>
+                        </div>
+                    </div>
+
+                    <div class="mt-6">
+                        <button type="submit" class="btn btn-primary w-full">
+                            <i class="fas fa-save mr-2"></i>Registrar Gasto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mostrar fecha actual en el navbar
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('es-CO', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        document.getElementById('gastos-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const mes = document.getElementById('mes').value;
+            const categoria = document.getElementById('categoria').value;
+            const descripcion = document.getElementById('descripcion').value;
+            const precio = document.getElementById('precio').value;
+
+            const datos = {
+                mes: mes,
+                categoria: categoria,
+                descripcion: descripcion,
+                precio: parseInt(precio)
+            };
+
+            try {
+                const respuesta = await fetch('/agregar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(datos)
+                });
+
+                const resultado = await respuesta.json();
+                const successContainer = document.getElementById('successContainer');
+                const mensajeDiv = document.getElementById('mensaje');
+                
+                if (respuesta.ok) {
+                    mensajeDiv.className = 'alert alert-success';
+                    mensajeDiv.innerHTML = `
+                        <i class="fas fa-check-circle mr-2"></i>
+                        ${resultado.mensaje}
+                    `;
+                    // Mostrar el contenedor con la imagen y el mensaje
+                    successContainer.style.display = 'flex';
+                    document.getElementById('gastos-form').reset();
+                    
+                    // Ocultar después de la animación
+                    setTimeout(() => {
+                        successContainer.style.display = 'none';
+                    }, 3000);
+                } else {
+                    mensajeDiv.className = 'alert alert-error';
+                    mensajeDiv.innerHTML = `
+                        <i class="fas fa-exclamation-circle mr-2"></i>
+                        ${resultado.error || 'Error al registrar el gasto'}
+                    `;
+                    successContainer.style.display = 'flex';
+                    setTimeout(() => {
+                        successContainer.style.display = 'none';
+                    }, 3000);
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                const mensajeDiv = document.getElementById('mensaje');
+                const successContainer = document.getElementById('successContainer');
+                mensajeDiv.className = 'alert alert-error';
+                mensajeDiv.innerHTML = `
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    Error de conexión
+                `;
+                successContainer.style.display = 'flex';
+                setTimeout(() => {
+                    successContainer.style.display = 'none';
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
