@@ -2,7 +2,7 @@ import os
 import json
 from flask import Flask, request, jsonify, render_template
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials
 from datetime import datetime
 from functools import wraps
 import time
@@ -13,13 +13,14 @@ app = Flask(__name__)
 # Configuración de las credenciales y alcance para Google Sheets API
 scope = [
     "https://spreadsheets.google.com/feeds",
+    "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive"
 ]
 
 # Obtener credenciales desde variables de entorno
 try:
     creds_dict = json.loads(os.getenv('GOOGLE_CREDENTIALS'))
-    creds = ServiceAccountCredentials.from_service_account_info(creds_dict, scope)
+    creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
     client = gspread.authorize(creds)
 except Exception as e:
     print(f"Error al configurar credenciales: {str(e)}")
